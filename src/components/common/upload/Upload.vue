@@ -15,7 +15,6 @@ export default {
   methods: {
     getFile(e) {
       this.$emit("get-file", e.target.files);
-      // 清空 input 的值,以防重复上传同一文件不执行该函数
       e.target.value = null;
     }
   }

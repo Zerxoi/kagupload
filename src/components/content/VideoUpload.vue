@@ -11,8 +11,6 @@
         @delete-progress="deleteHandle"
       />
     </upload>
-
-    <h2>{{progressList}}</h2>
   </div>
 </template>
 
@@ -50,8 +48,7 @@ export default {
           progress.percentage = 0;
           progress.tempCheckpoint = null;
           progress.client = Client();
-          progress.loading = false;
-
+          progress.status = "uploading";
           progress.client
             .multipartUpload(file.name, file, {
               progress: function(p, checkpoint) {
@@ -63,8 +60,10 @@ export default {
             // 取消任务之后解除加载状态
             .catch(e => {
               if (e.name === "cancel") {
-                progress.loading = false;
+                console.log("成功取消 " + progress.file.name + " 文件上传任务");
+                return;
               }
+              progress.status = "error";
             });
           this.progressList.push(progress);
         }
@@ -72,11 +71,11 @@ export default {
     },
     suspendHandle(index) {
       const progress = this.progressList[index];
-      progress.loading = true;
       progress.client.cancel();
     },
     continueHandle(index) {
       const progress = this.progressList[index];
+      progress.client = Client();
       progress.client
         .multipartUpload(progress.file.name, progress.file, {
           progress: function(p, checkpoint) {
@@ -88,15 +87,15 @@ export default {
         // 取消任务之后解除加载状态
         .catch(e => {
           if (e.name === "cancel") {
-            progress.loading = false;
+            console.log("成功取消 " + progress.file.name + " 文件上传任务");
+            return;
           }
+          progress.status = "error";
         });
     },
     deleteHandle(index) {
       const progress = this.progressList[index];
-      progress.loading = true;
       progress.client.cancel();
-
       this.progressList.splice(index, 1);
     }
   }

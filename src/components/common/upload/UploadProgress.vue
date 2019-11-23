@@ -1,12 +1,12 @@
 <template>
   <div>
-    <div v-if="status === 'upload'" v-loading="progress.loading">
+    <div v-if="status === 'upload'">
       <div class="file-name">{{progress.file.name}}</div>
       <span @click="suspendHandle(index)" class="suspend-btn" v-show="progress.percentage<100">暂停</span>
       <span @click="deleteHandle(index)" class="delete-btn">删除</span>
       <el-progress :percentage="progress.percentage<100?progress.percentage:100" class="progress"></el-progress>
     </div>
-    <div v-if="status === 'suspend'" v-loading="progress.loading">
+    <div v-if="status === 'suspend'">
       <div class="file-name">{{progress.file.name}}</div>
       <span @click="continueHandle(index)" class="continue-btn">继续</span>
       <span @click="deleteHandle(index)" class="delete-btn">删除</span>
@@ -16,9 +16,8 @@
         class="progress"
       ></el-progress>
     </div>
-    <div v-if="status === 'error'" v-loading="progress.loading">
+    <div v-if="status === 'error'">
       <div class="file-name">{{progress.file.name}}</div>
-      <span @click="continueHandle(index)" class="continue-btn">重传</span>
       <span @click="deleteHandle(index)" class="delete-btn">删除</span>
       <el-progress
         :percentage="progress.percentage<100?progress.percentage:100"
@@ -26,7 +25,7 @@
         class="progress"
       ></el-progress>
     </div>
-    <div v-if="status === 'success'" v-loading="progress.loading">
+    <div v-if="status === 'success'">
       <div class="file-name">{{progress.file.name}}</div>
       <span @click="deleteHandle(index)" class="delete-btn">删除</span>
       <el-progress
@@ -65,9 +64,13 @@ export default {
   },
   watch: {
     "progress.percentage": function(newValue) {
-      console.log(newValue);
       if (newValue >= 100) {
         this.status = "success";
+      }
+    },
+    "progress.status": function(newValue) {
+      if (newValue === 'error') {
+        this.status = 'error'
       }
     }
   }
